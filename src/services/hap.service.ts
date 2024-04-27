@@ -1,16 +1,25 @@
 import boom from "@hapi/boom";
 import { HapAttributes } from "../db/models/hap.model";
 import sequelize from "../libs/sequelize";
+import JoinedService from "./joined.service";
+import UserService from "./user.service";
 
 export default class HapService {
-    constructor() {}
+    
+    private joinedService: JoinedService;
+    private userService: UserService
+    
+    constructor() {
+        this.joinedService = new JoinedService();
+        this.userService = new UserService();
+    }
 
     public async create(hap: Partial<Omit<HapAttributes, 'id' | 'createdAt'>>) {
         const newHap = await sequelize.models.Hap.create(hap);
         return newHap;
     }
 
-    public async findById(id: string) {
+    async findById(id: string) {
         const hap = await sequelize.models.Hap.findByPk(id, {
             include: [{
                 model: sequelize.models.Joined,
@@ -18,7 +27,7 @@ export default class HapService {
                 include: [{
                     model: sequelize.models.User,
                     as: 'user',
-                    attributes: ['id', 'public_name', 'address'],
+                    attributes: ['id', 'public_name', 'address']
                 }],
             }]
         });
@@ -28,8 +37,11 @@ export default class HapService {
         return hap;
     }
 
-    public async update(id: string, changes: Partial<Omit<HapAttributes, 'id' | 'createdAt'>>) {
+    public async update(id: string, userId: string, changes: Partial<Omit<HapAttributes, 'id' | 'createdAt'>>) {
         const hap = await this.findById(id);
+        if (hap.dataValues.userId !== userId) {
+            throw boom.unauthorized('You are not the owner of this Hap');
+        }
         const updatedHap = await hap.update(changes);
         return updatedHap;
     }
@@ -39,13 +51,47 @@ export default class HapService {
         await hap.destroy();
     }
 
-    public async list() {
-        const haps = await sequelize.models.Hap.findAll();
+    public async list(page: number, pageSize: number) {
+        const offset = (page - 1) * pageSize;
+        const haps = await sequelize.models.Hap.findAndCountAll({
+            attributes: { exclude: ['secretWord', 'userId'] },
+            limit: pageSize,
+            offset: offset
+        });
         return haps;
     }
 
-    public async listByUserId(userId: string) {
-        const haps = await sequelize.models.Hap.findAll({ where: { userId } });
+    public async listByUserId(userId: string, page: number, pageSize: number) {
+        const offset = (page - 1) * pageSize;
+        const haps = await sequelize.models.Hap.findAndCountAll({
+            where: { userId },
+            limit: pageSize,
+            offset: offset
+        });
         return haps;
+    }
+
+    public async getHapsDetailsByOnwer(id: string, userId: string) {
+        const hap = await this.findById(id);
+        if (hap.dataValues !== userId) {
+            throw boom.unauthorized('You are not the owner of this Hap');
+        }
+        return hap;
+    }
+
+    public async getHapsPublicInfo(id: string) {
+        const hap = await sequelize.models.Hap.findByPk(id, {
+            attributes: { exclude: ['secretWord', 'userId'] }
+        });
+        return hap;
+    }
+
+    public async joinHap(hapId: string, userId: string) {
+        const hap = await this.findById(hapId);
+        await this.userService.findById(userId);
+        await this.joinedService.create({ hapId, userId });
+        delete hap.dataValues.secretWord;
+        delete hap.dataValues.userId;
+        return hap;
     }
 }

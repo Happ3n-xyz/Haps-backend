@@ -10,7 +10,9 @@ interface HapAttributes {
   chain: string;
   secretWord: string;
   message: string;
-  nftImage: string;
+  nftImage?: string;
+  ipfsHash?: string;
+  userId: string;
   createdAt: Date;
 }
 
@@ -46,9 +48,12 @@ const HapSchema = {
     type: DataTypes.STRING(255),
   },
   nftImage: {
-    allowNull: false,
     type: DataTypes.STRING,
     field: 'nft_image',
+  },
+  ipfsHash: {
+    type: DataTypes.STRING,
+    field: 'ipfs_hash',
   },
   userId: {
     allowNull: false,
@@ -76,6 +81,8 @@ class Hap extends Model<HapAttributes> {
   public secretWord!: string;
   public message!: string;
   public nftImage!: string;
+  public ipfsHash!: string;
+  public userId!: string;
   public createdAt!: Date;
 
   static associate(models: any) {
