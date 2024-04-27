@@ -6,8 +6,11 @@ import { HAP_TABLE } from './hap.model';
 const JOINED_TABLE = 'haps';
 
 interface JoinedAttributes {
-  id: string;
-  createdAt: Date;
+    id: string;
+    claimed: boolean;
+    userId: string;
+    hapId: string;
+    createdAt: Date;
 }
 
 const JoinedSchema = {
@@ -54,21 +57,24 @@ const JoinedSchema = {
 
 class Joined extends Model<JoinedAttributes> {
 
-  public id!: string;
-  public createdAt!: Date;
+    public id!: string;
+    public claimed!: boolean;
+    public userId!: string;
+    public hapId!: string;
+    public createdAt!: Date;
 
-  static associate(models: any) {
+    static associate(models: any) {
 
-  }
+    }
 
-  static config(sequelize: Sequelize) {
+    static config(sequelize: Sequelize) {
     return {
-      sequelize,
-      tableName: JOINED_TABLE,
-      modelName: 'Joined',
-      timestamps: false,
+        sequelize,
+        tableName: JOINED_TABLE,
+        modelName: 'Joined',
+        timestamps: false,
     };
-  }
+    }
 }
 
 export { JOINED_TABLE, JoinedSchema, Joined, JoinedAttributes };
