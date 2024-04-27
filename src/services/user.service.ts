@@ -1,5 +1,4 @@
 import boom from '@hapi/boom';
-import { config } from '../config/config';
 import { UserAttributes } from '../db/models/user.model';
 import sequelize from '../libs/sequelize';
 

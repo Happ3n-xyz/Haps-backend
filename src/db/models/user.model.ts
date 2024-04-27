@@ -65,7 +65,16 @@ class User extends Model<UserAttributes> {
   public createdAt!: Date;
 
   static associate(models: any) {
-
+    this.hasMany(models.Hap, {
+      as: 'haps',
+      foreignKey: 'userId',
+    });
+    this.belongsToMany(models.Hap, {
+      as: 'haps',
+      through: models.Joined,
+      foreignKey: 'userId',
+      otherKey: 'hapId',
+    });
   }
 
   static config(sequelize: Sequelize) {
