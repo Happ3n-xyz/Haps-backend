@@ -25,6 +25,7 @@ export default class JoinedService {
             include: [{
                 model: sequelize.models.Hap,
                 as: 'haps',
+                attributes: { exclude: ['secretWord', 'userId'] }
             }],
             where: { 
                 userId,
@@ -42,6 +43,7 @@ export default class JoinedService {
             include: [{
                 model: sequelize.models.Hap,
                 as: 'haps',
+                attributes: { exclude: ['secretWord', 'userId'] }
             }],
             where: { 
                 userId,
@@ -50,6 +52,22 @@ export default class JoinedService {
             offset: offset
         });
         return joined;
+    }
+
+    public async updateClaimed(hapId: string, userId: string) {
+        const joined = await sequelize.models.Joined.findOne({ 
+            where: { 
+                hapId,
+                userId
+            }
+        });
+
+        if (!joined) {
+            throw boom.notFound('Joined not found');
+        }
+
+        const updatedJoined = await joined.update({ claimed: true });
+        return updatedJoined;
     }
 
     public async delete(id: string) {

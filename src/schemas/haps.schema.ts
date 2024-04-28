@@ -1,5 +1,6 @@
 import joi from "joi";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "../utils/constants";
+import { id } from "ethers";
 
 export const getHap = joi.object({
     id: joi.string().uuid().required()
@@ -23,4 +24,9 @@ export const updateHap = joi.object({
     eventDate: joi.string().isoDate().optional(),
     secretWord: joi.string().max(15).optional(),
     message: joi.string().max(255).optional(),
+});
+
+export const claimHap = joi.object({
+    secretWord: joi.string().max(15).required(),
+    id: joi.string().uuid().required()
 });

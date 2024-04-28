@@ -3,7 +3,7 @@ import HapService from '../services/hap.service';
 import JoinedService from '../services/joined.service';
 import validatorHandler from '../middlewares/validator.handler';
 import passport from 'passport';
-import { basicPaginationHaps, createHap, getHap, updateHap } from '../schemas/haps.schema';
+import { basicPaginationHaps, claimHap, createHap, getHap, updateHap } from '../schemas/haps.schema';
 import { HapAttributes } from '../db/models/hap.model';
 
 const router = Router();
@@ -88,6 +88,20 @@ export default (app: Router) => {
         try {
             const { page, pageSize } = req.query as { page: string, pageSize: string };
             const result = await hapService.list(parseInt(page), parseInt(pageSize));
+            return res.json(result).status(200);
+        } catch (e) {
+            next(e);
+        }
+    });
+
+    router.post('/claim',
+    passport.authenticate('jwt', {session: false}),
+    validatorHandler(claimHap, 'body'),
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.user as { id: string };
+            const { secretWord, id: hapId } = req.body as { secretWord: string, id: string };
+            const result = await hapService.claimHap(hapId, id, secretWord);
             return res.json(result).status(200);
         } catch (e) {
             next(e);

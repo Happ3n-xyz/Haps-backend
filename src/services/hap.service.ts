@@ -94,4 +94,18 @@ export default class HapService {
         delete hap.dataValues.userId;
         return hap;
     }
+
+    public async claimHap(hapId: string, userId: string, secretWord: string) {
+        const hap = await this.findById(hapId);
+        if (hap.dataValues.secretWord !== secretWord) {
+            throw boom.unauthorized('Secret word is not correct');
+        }
+
+        //Pending: claim blockchain
+
+        await this.joinedService.updateClaimed(hapId, userId);
+        delete hap.dataValues.secretWord;
+        delete hap.dataValues.userId;
+        return hap;
+    }
 }
