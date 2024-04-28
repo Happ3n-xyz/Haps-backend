@@ -1,6 +1,5 @@
 import joi from "joi";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "../utils/constants";
-import { id } from "ethers";
 
 export const getHap = joi.object({
     id: joi.string().uuid().required()
