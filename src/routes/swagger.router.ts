@@ -6,13 +6,13 @@ import { config } from '../config/config';
 const swaggerDefinition = {
     openapi: '3.0.0',
     info: {
-      title: 'Express API for BetSell',
+      title: 'Express API for Happ3n',
       version: '1.0.0',
       description: 'This is a REST API application made with Express and TypeScript.',
     },
     servers: [
       {
-        url: 'https://api.betsell.io/api/',
+        url: 'https://haps.happ3n.xyz/api/',
         description: 'Production server',
       },
       {

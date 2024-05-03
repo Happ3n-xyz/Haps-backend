@@ -3,7 +3,7 @@ import { Model, DataTypes, Sequelize } from 'sequelize';
 import { USER_TABLE } from './user.model';
 import { HAP_TABLE } from './hap.model';
 
-const JOINED_TABLE = 'haps';
+const JOINED_TABLE = 'joined';
 
 interface JoinedAttributes {
     id: string;

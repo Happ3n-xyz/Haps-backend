@@ -66,7 +66,7 @@ class User extends Model<UserAttributes> {
 
   static associate(models: any) {
     this.hasMany(models.Hap, {
-      as: 'haps',
+      as: 'myHaps',
       foreignKey: 'userId',
     });
     this.belongsToMany(models.Hap, {

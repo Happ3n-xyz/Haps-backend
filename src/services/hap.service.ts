@@ -22,13 +22,9 @@ export default class HapService {
     async findById(id: string) {
         const hap = await sequelize.models.Hap.findByPk(id, {
             include: [{
-                model: sequelize.models.Joined,
-                as: 'joined',
-                include: [{
-                    model: sequelize.models.User,
-                    as: 'user',
-                    attributes: ['id', 'public_name', 'address']
-                }],
+                model: sequelize.models.User,
+                as: 'users',
+                attributes: ['id', 'public_name', 'address']
             }]
         });
         if (!hap) {
@@ -73,7 +69,7 @@ export default class HapService {
 
     public async getHapsDetailsByOnwer(id: string, userId: string) {
         const hap = await this.findById(id);
-        if (hap.dataValues !== userId) {
+        if (hap.dataValues.userId !== userId) {
             throw boom.unauthorized('You are not the owner of this Hap');
         }
         return hap;
@@ -83,6 +79,12 @@ export default class HapService {
         const hap = await sequelize.models.Hap.findByPk(id, {
             attributes: { exclude: ['secretWord', 'userId'] }
         });
+
+        if (!hap) {
+            throw boom.notFound('Hap not found');
+        }
+
+
         return hap;
     }
 
@@ -103,9 +105,11 @@ export default class HapService {
 
         //Pending: claim blockchain
 
-        await this.joinedService.updateClaimed(hapId, userId);
+        const claimed = await this.joinedService.updateClaimed(hapId, userId);
         delete hap.dataValues.secretWord;
         delete hap.dataValues.userId;
+        delete hap.dataValues.users;
+        hap.dataValues.Joined = claimed;
         return hap;
     }
 }

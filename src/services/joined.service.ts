@@ -21,37 +21,48 @@ export default class JoinedService {
 
     public async findClaimedByUserId(userId: string, page: number, pageSize: number) {
         const offset = (page - 1) * pageSize;
-        const joined = await sequelize.models.Joined.findAndCountAll({ 
+        const claimed = await sequelize.models.User.findByPk(userId,
+        {
+            attributes: ['id', 'public_name', 'address'],
             include: [{
                 model: sequelize.models.Hap,
                 as: 'haps',
-                attributes: { exclude: ['secretWord', 'userId'] }
+                attributes: { exclude: ['secretWord', 'userId'] },
+                through: {
+                    where: {
+                        claimed: true
+                    }
+                }
             }],
-            where: { 
-                userId,
-                claimed: true 
-            },
             limit: pageSize,
             offset: offset
         });
-        return joined;
+
+        if (!claimed) {
+            throw boom.notFound('User not found');
+        }
+
+        return claimed.dataValues.haps;
     }
 
     public async findJoinedByUserId(userId: string, page: number, pageSize: number) {
         const offset = (page - 1) * pageSize;
-        const joined = await sequelize.models.Joined.findAndCountAll({ 
+        const joined = await sequelize.models.User.findByPk(userId, {
+            attributes: ['id', 'public_name', 'address'],
             include: [{
                 model: sequelize.models.Hap,
                 as: 'haps',
-                attributes: { exclude: ['secretWord', 'userId'] }
+                attributes: { exclude: ['secretWord', 'userId'] },
             }],
-            where: { 
-                userId,
-            },
             limit: pageSize,
             offset: offset
         });
-        return joined;
+
+        if (!joined) {
+            throw boom.notFound('User not found');
+        }
+
+        return joined.dataValues.haps;
     }
 
     public async updateClaimed(hapId: string, userId: string) {

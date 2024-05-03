@@ -5,14 +5,45 @@ import validatorHandler from '../middlewares/validator.handler';
 import passport from 'passport';
 import { basicPaginationHaps, claimHap, createHap, getHap, updateHap } from '../schemas/haps.schema';
 import { HapAttributes } from '../db/models/hap.model';
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '../utils/constants';
 
 const router = Router();
 const hapService = new HapService();
 const joinedService = new JoinedService();
 
+/**
+ * @swagger
+ * tags:
+ *   name: Haps
+ *   description: Haps operations
+ */ 
 export default (app: Router) => {
     app.use('/haps', router);
 
+    /**
+     * @swagger
+     * /haps/created/{id}:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get an specific hap created by user
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *         type: string
+     *         description: Hap Id
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: Hap not found
+     */
     router.get('/created/:id',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(getHap, 'params'),
@@ -27,6 +58,32 @@ export default (app: Router) => {
         }
     });
 
+    /**
+     * @swagger
+     * /haps/created:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get all the haps created by user
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: query
+     *         name: page
+     *         schema:
+     *           type: string
+     *         description: Page number
+     *       - in: query
+     *         name: pageSize
+     *         schema:
+     *           type: string
+     *         description: Page size
+     *     responses:
+     *       200:
+     *         description: Returns the json with the haps details
+     *       401:
+     *         description: User not authorized
+     */
     router.get('/created',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(basicPaginationHaps, 'query'),
@@ -34,13 +91,41 @@ export default (app: Router) => {
         try {
             const { id } = req.user as { id: string };
             const { page, pageSize } = req.query as { page: string, pageSize: string };
-            const result = await hapService.listByUserId(id, parseInt(page), parseInt(pageSize));
+            const result = await hapService.listByUserId(id, parseInt(page) || DEFAULT_PAGE, parseInt(pageSize) || DEFAULT_PAGE_SIZE);
             return res.json(result).status(200);
         } catch (e) {
             next(e);
         }
     });
 
+    /**
+     * @swagger
+     * /haps/claimed:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get all the haps claimed by user
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: query
+     *         name: page
+     *         schema:
+     *           type: string
+     *         description: Page number
+     *       - in: query
+     *         name: pageSize
+     *         schema:
+     *           type: string
+     *         description: Page size
+     *     responses:
+     *       200:
+     *         description: Returns the json with the haps claimed
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: User not found
+     */
     router.get('/claimed',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(basicPaginationHaps, 'query'),
@@ -48,13 +133,41 @@ export default (app: Router) => {
         try {
             const { id } = req.user as { id: string };
             const { page, pageSize } = req.query as { page: string, pageSize: string };
-            const result = await joinedService.findClaimedByUserId(id, parseInt(page), parseInt(pageSize));
+            const result = await joinedService.findClaimedByUserId(id, parseInt(page) || DEFAULT_PAGE, parseInt(pageSize) || DEFAULT_PAGE_SIZE);
             return res.json(result).status(200);
         } catch (e) {
             next(e);
         }
     });
 
+    /**
+     * @swagger
+     * /haps/joined:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get all the haps joined by user
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: query
+     *         name: page
+     *         schema:
+     *           type: string
+     *         description: Page number
+     *       - in: query
+     *         name: pageSize
+     *         schema:
+     *           type: string
+     *         description: Page size
+     *     responses:
+     *       200:
+     *         description: Returns the json with the haps joined
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: User not found
+     */
     router.get('/joined',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(basicPaginationHaps, 'query'),
@@ -62,18 +175,43 @@ export default (app: Router) => {
         try {
             const { id } = req.user as { id: string };
             const { page, pageSize } = req.query as { page: string, pageSize: string };
-            const result = await joinedService.findJoinedByUserId(id, parseInt(page), parseInt(pageSize));
+            const result = await joinedService.findJoinedByUserId(id, parseInt(page) || DEFAULT_PAGE, parseInt(pageSize) || DEFAULT_PAGE_SIZE);
             return res.json(result).status(200);
         } catch (e) {
             next(e);
         }
     });
 
+    /**
+     * @swagger
+     * /haps/{id}:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get the public info for a hap
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *         type: string
+     *         description: Hap Id
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: Hap not found
+     */
     router.get('/:id',
+    passport.authenticate('jwt', {session: false}),
     validatorHandler(getHap, 'params'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { id } = req.user as { id: string };
+            const { id } = req.params as { id: string };
             const result = await hapService.getHapsPublicInfo(id);
             return res.json(result).status(200);
         } catch (e) {
@@ -81,19 +219,73 @@ export default (app: Router) => {
         }
     });
 
+    /**
+     * @swagger
+     * /haps:
+     *   get:
+     *     tags:
+     *       - Haps
+     *     summary: Get all the haps
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: query
+     *         name: page
+     *         schema:
+     *           type: string
+     *         description: Page number
+     *       - in: query
+     *         name: pageSize
+     *         schema:
+     *           type: string
+     *         description: Page size
+     *     responses:
+     *       200:
+     *         description: Returns the json with the haps details
+     *       401:
+     *         description: User not authorized
+     */
     router.get('/',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(basicPaginationHaps, 'query'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { page, pageSize } = req.query as { page: string, pageSize: string };
-            const result = await hapService.list(parseInt(page), parseInt(pageSize));
+            const result = await hapService.list(parseInt(page) || DEFAULT_PAGE, parseInt(pageSize) || DEFAULT_PAGE_SIZE);
             return res.json(result).status(200);
         } catch (e) {
             next(e);
         }
     });
 
+    /**
+     * @swagger
+     * /haps/claim:
+     *   post:
+     *     tags:
+     *       - Haps
+     *     summary: Claim a hap
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               id:
+     *                 type: string
+     *               secretWord:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: Hap not found
+     */
     router.post('/claim',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(claimHap, 'body'),
@@ -108,6 +300,30 @@ export default (app: Router) => {
         }
     });
 
+    /**
+     * @swagger
+     * /haps/join/{id}:
+     *   post:
+     *     tags:
+     *       - Haps
+     *     summary: Join a hap
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *         type: string
+     *         description: Hap Id
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: Hap not found
+     */
     router.post('/join/:id',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(getHap, 'params'),
@@ -122,6 +338,39 @@ export default (app: Router) => {
         }
     });
 
+    /**
+     * @swagger
+     * /haps:
+     *   post:
+     *     tags:
+     *       - Haps
+     *     summary: Create a new hap
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               eventName:
+     *                 type: string
+     *               eventDate:
+     *                 type: string
+     *               chain:
+     *                 type: string
+     *                 enum: ['celo', 'rari', 'optimism', 'arbitrum']
+     *               secretWord:
+     *                 type: string
+     *               message:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     */
     router.post('/',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(createHap, 'body'),
@@ -136,6 +385,47 @@ export default (app: Router) => {
         }
     });
 
+    /**
+     * @swagger
+     * /haps/{id}:
+     *   patch:
+     *     tags:
+     *       - Haps
+     *     summary: Delete a hap
+     *     security:
+     *       - bearerAuth: []
+     *     parameters:
+     *       - in: path
+     *         name: id
+     *         required: true
+     *         schema:
+     *         type: string
+     *         description: Hap Id
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               eventName:
+     *                 type: string
+     *               eventDate:
+     *                 type: string
+     *               chain:
+     *                 type: string
+     *               secretWord:
+     *                 type: string
+     *               message:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Returns the json with the hap details
+     *       401:
+     *         description: User not authorized
+     *       404:
+     *         description: Hap not found
+     */
     router.patch('/:id',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(getHap, 'params'),

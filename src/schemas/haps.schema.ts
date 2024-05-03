@@ -6,8 +6,8 @@ export const getHap = joi.object({
 });
 
 export const basicPaginationHaps = joi.object({
-    page: joi.number().optional().default(DEFAULT_PAGE),
-    pageSize: joi.number().optional().default(DEFAULT_PAGE_SIZE)
+    page: joi.number().default(DEFAULT_PAGE),
+    pageSize: joi.number().default(DEFAULT_PAGE_SIZE)
 });
 
 export const createHap = joi.object({

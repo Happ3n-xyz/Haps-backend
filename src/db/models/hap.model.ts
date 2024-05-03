@@ -86,7 +86,7 @@ class Hap extends Model<HapAttributes> {
   public createdAt!: Date;
 
   static associate(models: any) {
-    this.belongsTo(models.User, {as: 'owner'});
+    this.belongsTo(models.User, {as: 'user'});
     this.belongsToMany(models.User, {
       as: 'users',
       through: models.Joined,

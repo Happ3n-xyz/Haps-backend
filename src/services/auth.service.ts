@@ -23,7 +23,7 @@ export default class AuthService {
                 username: await generateRandomUsername(),
                 address: address,
             }
-            await this.userservice.create(userPayload);
+            await this.userservice.create({...userPayload, nonce});
         } else {
             const id = user.get('id');
             await this.userservice.update(id as string, { nonce });
