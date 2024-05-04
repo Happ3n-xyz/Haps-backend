@@ -3,6 +3,7 @@ import { HapAttributes } from "../db/models/hap.model";
 import sequelize from "../libs/sequelize";
 import JoinedService from "./joined.service";
 import UserService from "./user.service";
+import jwt from 'jsonwebtoken';
 
 export default class HapService {
     
@@ -75,7 +76,7 @@ export default class HapService {
         return hap;
     }
 
-    public async getHapsPublicInfo(id: string) {
+    public async getHapsPublicInfo(id: string, token: string) {
         const hap = await sequelize.models.Hap.findByPk(id, {
             attributes: { exclude: ['secretWord', 'userId'] }
         });
@@ -84,8 +85,17 @@ export default class HapService {
             throw boom.notFound('Hap not found');
         }
 
+        if (token) {
+            const decoded : any = jwt.decode(token);
+            const joined = await this.joinedService.findJoinedByUserIdAndHapId(decoded.id, id);
+            if (joined) {
+                return { ...hap.dataValues, joined: true, claimed: joined.dataValues.claimed };
+            } else {
+                return { ...hap.dataValues, joined: false, claimed: false };
+            }
+        }
 
-        return hap;
+        return { ...hap.dataValues, joined: false, claimed: false };
     }
 
     public async joinHap(hapId: string, userId: string) {

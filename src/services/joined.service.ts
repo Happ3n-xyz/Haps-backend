@@ -19,6 +19,17 @@ export default class JoinedService {
         return joined;
     }
 
+    public async findJoinedByUserIdAndHapId(userId: string, hapId: string) {
+        const joined = await sequelize.models.Joined.findOne({
+            where: {
+                userId,
+                hapId
+            }
+        });
+
+        return joined;
+    }
+
     public async findClaimedByUserId(userId: string, page: number, pageSize: number) {
         const offset = (page - 1) * pageSize;
         const claimed = await sequelize.models.User.findByPk(userId,

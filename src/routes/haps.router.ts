@@ -3,7 +3,7 @@ import HapService from '../services/hap.service';
 import JoinedService from '../services/joined.service';
 import validatorHandler from '../middlewares/validator.handler';
 import passport from 'passport';
-import { basicPaginationHaps, claimHap, createHap, getHap, updateHap } from '../schemas/haps.schema';
+import { basicPaginationHaps, claimHap, createHap, getHap, getHapDetails, updateHap } from '../schemas/haps.schema';
 import { HapAttributes } from '../db/models/hap.model';
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '../utils/constants';
 
@@ -189,8 +189,6 @@ export default (app: Router) => {
      *     tags:
      *       - Haps
      *     summary: Get the public info for a hap
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: path
      *         name: id
@@ -198,6 +196,10 @@ export default (app: Router) => {
      *         schema:
      *         type: string
      *         description: Hap Id
+     *       - in: query
+     *         name: token
+     *         schema:
+     *         type: string
      *     responses:
      *       200:
      *         description: Returns the json with the hap details
@@ -207,12 +209,13 @@ export default (app: Router) => {
      *         description: Hap not found
      */
     router.get('/:id',
-    passport.authenticate('jwt', {session: false}),
     validatorHandler(getHap, 'params'),
+    validatorHandler(getHapDetails, 'query'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params as { id: string };
-            const result = await hapService.getHapsPublicInfo(id);
+            const { token } = req.query as { token: string };
+            const result = await hapService.getHapsPublicInfo(id, token);
             return res.json(result).status(200);
         } catch (e) {
         next(e);
@@ -226,8 +229,6 @@ export default (app: Router) => {
      *     tags:
      *       - Haps
      *     summary: Get all the haps
-     *     security:
-     *       - bearerAuth: []
      *     parameters:
      *       - in: query
      *         name: page
@@ -246,7 +247,6 @@ export default (app: Router) => {
      *         description: User not authorized
      */
     router.get('/',
-    passport.authenticate('jwt', {session: false}),
     validatorHandler(basicPaginationHaps, 'query'),
     async (req: Request, res: Response, next: NextFunction) => {
         try {

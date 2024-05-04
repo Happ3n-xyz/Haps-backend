@@ -32,3 +32,7 @@ export const claimHap = joi.object({
     secretWord: joi.string().max(15).required(),
     id: joi.string().uuid().required()
 });
+
+export const getHapDetails = joi.object({
+    token: joi.string().optional(),
+});
