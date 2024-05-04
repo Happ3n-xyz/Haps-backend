@@ -1,5 +1,6 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 import { USER_TABLE } from './user.model';
+import { allow } from 'joi';
 
 const HAP_TABLE = 'haps';
 
@@ -10,8 +11,9 @@ interface HapAttributes {
   chain: string;
   secretWord: string;
   message: string;
-  nftImage?: string;
-  ipfsHash?: string;
+  nftImage: string;
+  tokenId: string;
+  ipfsHash: string;
   userId: string;
   createdAt: Date;
 }
@@ -48,10 +50,17 @@ const HapSchema = {
     type: DataTypes.STRING(255),
   },
   nftImage: {
+    allowNull: false,
     type: DataTypes.STRING,
     field: 'nft_image',
   },
+  tokenId: {
+    allowNull: false,
+    type: DataTypes.STRING,
+    field: 'token_id',
+  },
   ipfsHash: {
+    allowNull: false,
     type: DataTypes.STRING,
     field: 'ipfs_hash',
   },
@@ -82,6 +91,7 @@ class Hap extends Model<HapAttributes> {
   public message!: string;
   public nftImage!: string;
   public ipfsHash!: string;
+  public tokenId!: string;
   public userId!: string;
   public createdAt!: Date;
 

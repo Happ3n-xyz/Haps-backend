@@ -65,7 +65,7 @@ export default class JoinedService {
         return joined.dataValues.haps;
     }
 
-    public async updateClaimed(hapId: string, userId: string) {
+    public async updateClaimed(hapId: string, userId: string, txHash: string) {
         const joined = await sequelize.models.Joined.findOne({ 
             where: { 
                 hapId,
@@ -77,7 +77,7 @@ export default class JoinedService {
             throw boom.notFound('Joined not found');
         }
 
-        const updatedJoined = await joined.update({ claimed: true });
+        const updatedJoined = await joined.update({ claimed: true, txHash });
         return updatedJoined;
     }
 

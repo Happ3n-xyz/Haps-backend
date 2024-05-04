@@ -10,6 +10,7 @@ interface JoinedAttributes {
     claimed: boolean;
     userId: string;
     hapId: string;
+    txHash?: string;
     createdAt: Date;
 }
 
@@ -24,6 +25,10 @@ const JoinedSchema = {
         allowNull: false,
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+    },
+    txHash: {
+        type: DataTypes.STRING,
+        field: 'tx_hash',
     },
     userId: {
         allowNull: false,
@@ -59,6 +64,7 @@ class Joined extends Model<JoinedAttributes> {
 
     public id!: string;
     public claimed!: boolean;
+    public txHash!: string;
     public userId!: string;
     public hapId!: string;
     public createdAt!: Date;

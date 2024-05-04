@@ -354,6 +354,12 @@ export default (app: Router) => {
      *           schema:
      *             type: object
      *             properties:
+     *               tokenId:
+     *                 type: string
+     *               nftImage:
+     *                 type: string
+     *               ipfsHash:
+     *                 type: string
      *               eventName:
      *                 type: string
      *               eventDate:

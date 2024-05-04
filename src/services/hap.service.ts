@@ -104,8 +104,9 @@ export default class HapService {
         }
 
         //Pending: claim blockchain
-
-        const claimed = await this.joinedService.updateClaimed(hapId, userId);
+        const txHash = '0xabcd1234';
+        
+        const claimed = await this.joinedService.updateClaimed(hapId, userId, txHash);
         delete hap.dataValues.secretWord;
         delete hap.dataValues.userId;
         delete hap.dataValues.users;

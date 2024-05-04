@@ -11,6 +11,9 @@ export const basicPaginationHaps = joi.object({
 });
 
 export const createHap = joi.object({
+    tokenId: joi.string().required(),
+    ipfsHash: joi.string().required(),
+    nftImage: joi.string().required(),
     eventName: joi.string().required(),
     eventDate: joi.string().isoDate().required(),
     chain: joi.string().equal('celo', 'rari', 'optimism', 'arbitrum').required(),
