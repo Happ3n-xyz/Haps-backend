@@ -12,6 +12,9 @@ interface Config {
   jwtSecret: string;
   google_client_id: string;
   google_client_secret: string;
+  pk: string;
+  contractAddress: string;
+  rpcUrl: string;
 }
 
 const config: Config = {
@@ -25,6 +28,9 @@ const config: Config = {
   jwtSecret: process.env.JWT_SECRET || 'secret',
   google_client_id: process.env.GOOGLE_CLIENT_ID || '',
   google_client_secret: process.env.GOOGLE_CLIENT_SECRET || '',
+  pk: process.env.PK || '',
+  contractAddress: process.env.CONTRACT_ADDRESS || '',
+  rpcUrl: process.env.RPC_URL || ''
 }
 
 export { config };

@@ -4,7 +4,8 @@ import sequelize from "../libs/sequelize";
 import JoinedService from "./joined.service";
 import UserService from "./user.service";
 import jwt from 'jsonwebtoken';
-
+import { ethers } from "ethers";
+import { config } from "../config/config";
 export default class HapService {
     
     private joinedService: JoinedService;
@@ -112,9 +113,14 @@ export default class HapService {
         if (hap.dataValues.secretWord !== secretWord) {
             throw boom.unauthorized('Secret word is not correct');
         }
-
-        //Pending: claim blockchain
-        const txHash = '0xabcd1234';
+        const user = await this.userService.findById(userId);
+        if (user.dataValues.address === null) {
+            throw boom.badRequest('You need to set your wallet address before claiming a Hap');
+        }
+        const txHash = await this.transferNFT(user.dataValues.address, hap.dataValues.tokenId, "1");
+        if (!txHash) {
+            throw boom.badRequest('Error claiming NFT');
+        }
         
         const claimed = await this.joinedService.updateClaimed(hapId, userId, txHash);
         delete hap.dataValues.secretWord;
@@ -122,5 +128,24 @@ export default class HapService {
         delete hap.dataValues.users;
         hap.dataValues.Joined = claimed;
         return hap;
+    }
+
+    private async transferNFT(to: string, tokenId: number, amount: string) {
+        try {
+            const provider = new ethers.JsonRpcProvider(config.rpcUrl);
+            const wallet = new ethers.Wallet(config.pk, provider);
+            const contract = new ethers.Contract(config.contractAddress, [
+                "function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes data)"
+            ], wallet);
+            const myData = [1, 2, 3];
+            const bytes = new Uint8Array(myData);
+            const tx = await contract.safeTransferFrom(wallet.address, to, tokenId, ethers.parseEther(amount), ethers.hexlify(bytes));
+            await tx.wait();
+            return tx.hash;
+        } catch (error) {
+            console.log('error transfering is ...', error);
+            return null;
+        }
+        
     }
 }
