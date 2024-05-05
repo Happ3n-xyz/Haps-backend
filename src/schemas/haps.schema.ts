@@ -17,6 +17,7 @@ export const createHap = joi.object({
     eventName: joi.string().required(),
     eventDate: joi.string().isoDate().required(),
     eventLocation: joi.string().required(),
+    externalUrlEvent: joi.string().optional(),
     chain: joi.string().equal('celo', 'rari', 'optimism', 'arbitrum').required(),
     secretWord: joi.string().max(15).required(),
     message: joi.string().max(255).required(),
@@ -26,6 +27,7 @@ export const updateHap = joi.object({
     eventName: joi.string().optional(),
     eventDate: joi.string().isoDate().optional(),
     eventLocation: joi.string().optional(),
+    externalUrlEvent: joi.string().optional(),
     secretWord: joi.string().max(15).optional(),
     message: joi.string().max(255).optional(),
 });

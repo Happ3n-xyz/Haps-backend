@@ -9,6 +9,7 @@ interface HapAttributes {
   eventName: string;
   eventDate: Date;
   eventLocation: string;
+  externalUrlEvent?: string;
   chain: string;
   secretWord: string;
   message: string;
@@ -40,6 +41,11 @@ const HapSchema = {
     allowNull: false,
     type: DataTypes.DATE,
     field: 'event_date',
+  },
+  externalUrlEvent: {
+    allowNull: true,
+    type: DataTypes.STRING,
+    field: 'external_url_event',
   },
   chain: {
     allowNull: false,
@@ -93,6 +99,7 @@ class Hap extends Model<HapAttributes> {
   public eventName!: string;
   public eventDate!: Date;
   public eventLocation!: string;
+  public externalUrlEvent!: string;
   public chain!: string;
   public secretWord!: string;
   public message!: string;

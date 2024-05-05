@@ -364,6 +364,8 @@ export default (app: Router) => {
      *                 type: string
      *               eventDate:
      *                 type: string
+     *               externalUrlEvent:
+     *                 type: string 
      *               eventLocation:
      *                 type: string
      *               chain:
@@ -420,6 +422,8 @@ export default (app: Router) => {
      *                 type: string
      *               eventDate:
      *                 type: string
+     *               externalUrlEvent:
+     *                 type: string 
      *               eventLocation:
      *                 type: string
      *               chain:
