@@ -8,6 +8,7 @@ interface HapAttributes {
   id: string;
   eventName: string;
   eventDate: Date;
+  eventLocation: string;
   chain: string;
   secretWord: string;
   message: string;
@@ -29,6 +30,11 @@ const HapSchema = {
     allowNull: false,
     type: DataTypes.STRING,
     field: 'event_name',
+  },
+  eventLocation: {
+    allowNull: false,
+    type: DataTypes.STRING,
+    field: 'event_location',
   },
   eventDate: {
     allowNull: false,
@@ -86,6 +92,7 @@ class Hap extends Model<HapAttributes> {
   public id!: string;
   public eventName!: string;
   public eventDate!: Date;
+  public eventLocation!: string;
   public chain!: string;
   public secretWord!: string;
   public message!: string;

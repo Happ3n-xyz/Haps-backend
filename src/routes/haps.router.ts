@@ -364,6 +364,8 @@ export default (app: Router) => {
      *                 type: string
      *               eventDate:
      *                 type: string
+     *               eventLocation:
+     *                 type: string
      *               chain:
      *                 type: string
      *                 enum: ['celo', 'rari', 'optimism', 'arbitrum']
@@ -417,6 +419,8 @@ export default (app: Router) => {
      *               eventName:
      *                 type: string
      *               eventDate:
+     *                 type: string
+     *               eventLocation:
      *                 type: string
      *               chain:
      *                 type: string
