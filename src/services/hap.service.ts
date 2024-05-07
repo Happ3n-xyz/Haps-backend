@@ -90,13 +90,15 @@ export default class HapService {
             const decoded : any = jwt.decode(token);
             const joined = await this.joinedService.findJoinedByUserIdAndHapId(decoded.id, id);
             if (joined) {
-                return { ...hap.dataValues, joined: true, claimed: joined.dataValues.claimed };
+                hap.dataValues.joined = joined
+                return hap;
             } else {
-                return { ...hap.dataValues, joined: false, claimed: false };
+                hap.dataValues.joined = null;
+                return hap;
             }
         }
-
-        return { ...hap.dataValues, joined: false, claimed: false };
+        hap.dataValues.joined = null;
+        return hap;
     }
 
     public async joinHap(hapId: string, userId: string) {
